@@ -21,7 +21,7 @@ typedef struct
 
 void resetStack();
 void initVM();
-CompilerError recognize(Bucket*, TokenArray*);
+CompilerError recognize(Bucket*);
 // translator
 void run(Bucket*);
 void push(Value);

@@ -13,9 +13,19 @@ TokenArray* initTokenArray()
 void addTokenData(TokenArray* ta, char* data)
 {
 	Token* newToken = (Token*)malloc(sizeof(Token));
-	newToken->data = (char*)malloc(sizeof(char) * strlen(data) + 1);
 
-	if (ta->current == NULL || ta->current == (Token*)0xcccccccc)
+	if (data == NULL)
+	{
+		newToken->type = TOKEN_EOT;
+		return;
+	}
+	else
+	{
+		newToken->data = (char*)malloc(sizeof(char) * strlen(data) + 1);
+	}
+
+
+	if (ta->current == NULL)// || ta->current == (Token*)0xcccccccc)
 		ta->current = newToken;
 	else
 	{

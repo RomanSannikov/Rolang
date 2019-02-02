@@ -11,23 +11,29 @@ void scanFile(Bucket* bt, const char* fileName)
 #define SIZE_OF_WORD 256
 	char word[SIZE_OF_WORD];
 	FILE* file = fopen(fileName, "r");
+	int counter;
+	bool isWord = false;
 
 	assert(file);
 
-	for (int i = 0; !feof(file); i++)
+	for (counter = 0; !feof(file); counter++)
 	{
-		word[i] = fgetc(file);
+		word[counter] = fgetc(file);
 
-		if ((word[i] == ' ' || word[i] == '\n') && i != 0)
+		if ((word[counter] == ' ' || word[counter] == '\n' || word[counter] == EOF) && isWord)
 		{
-			char* tempData = (char*)malloc(sizeof(char) * i);
-			strncpy(tempData, word, i + 1);
-			addTokenData(&bt->tokens, tempData);
-			i = -1;
+			char* tempData = (char*)malloc(sizeof(char) * counter + 1);
+			word[counter] = '\0';
+			strcpy(tempData, word);
+			addTokenData(bt->tokens, tempData);
+			counter = -1;
+			isWord = false;
 		}
+		else
+			isWord = true;
 	}
 
-	addTokenData(&bt->tokens, NULL);
+	addTokenData(bt->tokens, NULL);
 
 	fclose(file);
 
@@ -39,12 +45,12 @@ int main(int argc, char* argv[])
 {
 	Bucket bucket;
 
-	scanFile(&bucket, "code.txt");
-
 	initVM();
 	initBucket(&bucket);
 
-	if (recognize(&bucket, &bucket.tokens) != COMPILED_WELL)
+	scanFile(&bucket, "code.txt");
+
+	if (recognize(&bucket) != COMPILED_WELL)
 	{
 		printf("Cannot recognize...\n");
 		exit(1);

@@ -11,7 +11,7 @@ void initBucket(Bucket* bt)
 	bt->capacity = 8;
 	bt->count = 0;
 	bt->code = (uint8_t*)malloc(sizeof(uint8_t) * 8);
-	TokenArray* tokens = initTokenArray();
+	bt->tokens = initTokenArray();
 
 	initValues(&bt->values);
 }
@@ -31,7 +31,7 @@ int addBucketValue(Bucket* bt, Value value)
 
 void freeBucket(Bucket* bt)
 {
-	freeTokenArray(&bt->tokens);
+	freeTokenArray(bt->tokens);
 	freeValues(&bt->values);
 	free(bt->code);
 }

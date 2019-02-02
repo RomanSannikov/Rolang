@@ -27,7 +27,7 @@ typedef struct
 	unsigned int count;
 	uint8_t* code;
 	ValueArray values;
-	TokenArray tokens;
+	TokenArray* tokens;
 } Bucket;
 
 void initBucket(Bucket*);

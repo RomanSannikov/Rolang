@@ -44,9 +44,9 @@ static Value doNumber(char string[])
 	return value;
 }
 
-CompilerError recognize(Bucket* bt, TokenArray* ta)
+CompilerError recognize(Bucket* bt)
 {
-	Token* token = (Token*)ta->first;
+	Token* token = (Token*)bt->tokens->first;
 
 	while (token->type != TOKEN_EOT)
 	{
