@@ -5,7 +5,7 @@ static int disassembleInstruction(Bucket* bt, uint8_t byte, int offset)
 	switch (byte)
 	{
 	case OP_PUSH:
-		printf("OP_PUSH\t%g\n", bt->values.values[bt->code[offset + 1]]);
+		printf("OP_PUSH\t\t%g\n", bt->values.values[bt->code[offset + 1]]);
 		return offset + 2;
 	case OP_ADD:
 		printf("OP_ADD\n");

@@ -37,10 +37,10 @@ static bool isNumber(char* string)
 
 static Value doNumber(char string[])
 {
-	// The functoin doesn't return any error value because the number's passed all tests to be a number
+	// The functoin doesn't return any error value because the number is passed all tests to be a number
 	Value value = 0;
-	for (int i = 0, k = 1; string[i] > '0' - 1 && string[i] < '9' + 1; i++, k *= 10)
-		value += string[i] * k;
+	for (int i = 0, k = 1; string[i] >= '0'&& string[i] <= '9'; i++, k *= 10)
+		value += (string[i] - 48) * k;
 	return value;
 }
 
@@ -101,10 +101,10 @@ CompilerError recognize(Bucket* bt)
 	return COMPILED_WELL;
 }
 
-void translate(Bucket* bt, TokenArray* ta)
+void translate(Bucket* bt)
 {
 #define SIZE_OF_STACK
-	Token* token = ta->first;
+	Token* token = bt->tokens->first;
 
 	while (token->type != TOKEN_EOT)
 	{
@@ -115,7 +115,7 @@ void translate(Bucket* bt, TokenArray* ta)
 			TokenType stack[100]; // stack for operators
 			int sp = 0; // stack pointer
 			
-			while (token->type != TOKEN_EOT || token->type != TOKEN_SEMICOLON)
+			while (token->type != TOKEN_EOT && token->type != TOKEN_SEMICOLON)
 			{
 				if (token->type == TOKEN_PLUS || token->type == TOKEN_MINUS 
 								|| token->type == TOKEN_ASTERISK || token->type == TOKEN_SLASH || token->type == TOKEN_LPARENTHESES)
@@ -123,9 +123,9 @@ void translate(Bucket* bt, TokenArray* ta)
 					stack[sp] = token->type;
 					sp++;
 				}
-				else if (token->type == TOKEN_RPARENTHESES)
+				else if (token->type == TOKEN_RPARENTHESES && token->type == TOKEN_SEMICOLON)
 				{
-					while (stack[sp] != TOKEN_RPARENTHESES)
+					while (stack[sp] != TOKEN_RPARENTHESES && token->type != TOKEN_SEMICOLON)
 					{
 						sp--;
 						switch (stack[sp])
@@ -146,21 +146,51 @@ void translate(Bucket* bt, TokenArray* ta)
 
 				token = token->next;
 			}
+
+			while (stack[sp] != TOKEN_RPARENTHESES && token->type != TOKEN_SEMICOLON)
+			{
+				sp--;
+				switch (stack[sp])
+				{
+				case TOKEN_PLUS: writeCode(bt, OP_ADD); break;
+				case TOKEN_MINUS: writeCode(bt, OP_SUB); break;
+				case TOKEN_ASTERISK: writeCode(bt, OP_MUL); break;
+				case TOKEN_SLASH: writeCode(bt, OP_DIV); break;
+				}
+			}
 		}
 
-		token = token->next;
+		if (token->type != TOKEN_EOT)
+			token = token->next;
+		else
+			writeCode(bt, OP_RETURN);
 	}
 #undef SIZE_OF_STACK
 }
 
+void binaryOp(char op)
+{
+	Value b = pop();
+	Value a = pop();
+	switch (op)
+	{
+	case '+':
+		push(a + b);
+		break;
+	case '-':
+		push(a - b);
+		break;
+	case '*':
+		push(a * b);
+		break;
+	case '/':
+		push(a / b);
+		break;
+	}
+}
+
 void run(Bucket* bt)
 {
-#define BINARY_OP(op) do { \
-						Value b = pop(); \
-						Value a = pop(); \
-						push(a op b); \
-					} while(false);
-
 	for (unsigned int pc = 0; pc < bt->count; pc++)
 	{
 		switch (bt->code[pc])
@@ -173,24 +203,23 @@ void run(Bucket* bt)
 			pop();
 			break;
 		case OP_ADD:
-			BINARY_OP(+);
+			binaryOp('+');
 			break;
 		case OP_SUB:
-			BINARY_OP(-);
+			binaryOp('-');
 			break;
 		case OP_MUL:
-			BINARY_OP(*);
+			binaryOp('*');
 			break;
 		case OP_DIV:
-			BINARY_OP(/);
+			binaryOp('/');
 			break;
 		case OP_RETURN:
-			printf("IT'S POPPED %g\n", pop()); // very first time
+			printf("IT'S POPPED %g\n", pop());
 			pc++;
 			break;
 		default:
 			break;
 		}
 	}
-#undef BINARY_OP
 }

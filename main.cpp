@@ -55,6 +55,8 @@ int main(int argc, char* argv[])
 		printf("Cannot recognize...\n");
 		exit(1);
 	}
+
+	translate(&bucket);
 	
 	disassemble(&bucket);
 

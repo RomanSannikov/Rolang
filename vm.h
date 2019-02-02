@@ -22,7 +22,7 @@ typedef struct
 void resetStack();
 void initVM();
 CompilerError recognize(Bucket*);
-// translator
+void translate(Bucket*);
 void run(Bucket*);
 void push(Value);
 Value pop();
