@@ -13,20 +13,23 @@ TokenArray* initTokenArray()
 void addTokenData(TokenArray* ta, char* data)
 {
 	Token* newToken = (Token*)malloc(sizeof(Token));
+	newToken->next = NULL;
 
 	if (data == NULL)
 	{
 		newToken->type = TOKEN_EOT;
-		return;
+		newToken->data = NULL;
 	}
 	else
 	{
 		newToken->data = (char*)malloc(sizeof(char) * strlen(data) + 1);
+		strcpy(newToken->data, data);
 	}
 
-
-	if (ta->current == NULL)// || ta->current == (Token*)0xcccccccc)
+	if (ta->current == NULL)
+	{
 		ta->current = newToken;
+	}
 	else
 	{
 		ta->current->next = newToken;
@@ -34,11 +37,7 @@ void addTokenData(TokenArray* ta, char* data)
 	}
 
 	if (ta->first == NULL)
-	{
 		ta->first = newToken;
-	}
-
-	strcpy(newToken->data, data);
 }
 
 void freeTokenArray(TokenArray* ta)
@@ -47,7 +46,8 @@ void freeTokenArray(TokenArray* ta)
 
 	while (current != NULL)
 	{
-		free(current->data);
+		if(current->data != NULL)
+			free(current->data);
 
 		if (last != NULL)
 			free(last);

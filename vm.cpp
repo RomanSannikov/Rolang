@@ -54,35 +54,35 @@ CompilerError recognize(Bucket* bt)
 		{
 			token->type = TOKEN_NUMBER;
 		}
-		else if (token->data == "+")
+		else if (token->data[0] == '+')
 		{
 			token->type = TOKEN_PLUS;
 		}
-		else if (token->data == "-")
+		else if (token->data[0] == '-')
 		{
 			token->type = TOKEN_MINUS;
 		}
-		else if (token->data == "*")
+		else if (token->data[0] == '*')
 		{
 			token->type = TOKEN_ASTERISK;
 		}
-		else if (token->data == "/")
+		else if (token->data[0] == '/')
 		{
 			token->type = TOKEN_SLASH;
 		}
-		else if (token->data == "(")
+		else if (token->data[0] == '(')
 		{
 			token->type = TOKEN_LPARENTHESES;
 		}
-		else if (token->data == ")")
+		else if (token->data[0] == ')')
 		{
 			token->type = TOKEN_RPARENTHESES;
 		}
-		else if (token->data == "=")
+		else if (token->data[0] == '=')
 		{
 			token->type = TOKEN_EQUAL;
 		}
-		else if (token->data == ";")
+		else if (token->data[0] == ';')
 		{
 			token->type = TOKEN_SEMICOLON;
 		}
@@ -90,6 +90,12 @@ CompilerError recognize(Bucket* bt)
 		{
 			token->type = TOKEN_EOT;
 		}
+		else
+		{
+			return COMPILATION_FELT;
+		}
+
+		token = token->next;
 	}
 
 	return COMPILED_WELL;
