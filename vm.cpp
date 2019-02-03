@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "vm.h"
 
@@ -39,7 +40,7 @@ static Value doNumber(char string[])
 {
 	// The functoin doesn't return any error value because the number is passed all tests to be a number
 	Value value = 0;
-	for (int i = 0, k = 1; string[i] >= '0'&& string[i] <= '9'; i++, k *= 10)
+	for (int i = 0, k = pow(10, strlen(string) - 1); string[i] >= '0' && string[i] <= '9'; i++, k /= 10)
 		value += (string[i] - 48) * k;
 	return value;
 }
@@ -105,6 +106,7 @@ void translate(Bucket* bt)
 {
 #define SIZE_OF_STACK
 	Token* token = bt->tokens->first;
+	TokenType op = TOKEN_NOPE;
 
 	while (token->type != TOKEN_EOT)
 	{
@@ -120,12 +122,26 @@ void translate(Bucket* bt)
 				if (token->type == TOKEN_PLUS || token->type == TOKEN_MINUS 
 								|| token->type == TOKEN_ASTERISK || token->type == TOKEN_SLASH || token->type == TOKEN_LPARENTHESES)
 				{
+					if ((op == TOKEN_ASTERISK || op == TOKEN_SLASH) && (token->type == TOKEN_PLUS || token->type == TOKEN_MINUS))
+					{
+						--sp;
+						switch (op)
+						{
+							case TOKEN_PLUS: writeCode(bt, OP_ADD); break;
+							case TOKEN_MINUS: writeCode(bt, OP_SUB); break;
+							case TOKEN_ASTERISK: writeCode(bt, OP_MUL); break;
+							case TOKEN_SLASH: writeCode(bt, OP_DIV); break;
+						}
+						
+					}
+
 					stack[sp] = token->type;
 					sp++;
+					op = token->type;
 				}
-				else if (token->type == TOKEN_RPARENTHESES && token->type == TOKEN_SEMICOLON)
+				else if (token->type == TOKEN_RPARENTHESES || token->type == TOKEN_SEMICOLON)
 				{
-					while (stack[sp] != TOKEN_RPARENTHESES && token->type != TOKEN_SEMICOLON)
+					while (sp > 0 && stack[sp] != TOKEN_LPARENTHESES)
 					{
 						sp--;
 						switch (stack[sp])
@@ -136,7 +152,6 @@ void translate(Bucket* bt)
 							case TOKEN_SLASH: writeCode(bt, OP_DIV); break;
 						}
 					}
-					sp--;
 				}
 				else
 				{
@@ -147,7 +162,7 @@ void translate(Bucket* bt)
 				token = token->next;
 			}
 
-			while (stack[sp] != TOKEN_RPARENTHESES && token->type != TOKEN_SEMICOLON)
+			while (sp > 0)
 			{
 				sp--;
 				switch (stack[sp])
@@ -163,7 +178,10 @@ void translate(Bucket* bt)
 		if (token->type != TOKEN_EOT)
 			token = token->next;
 		else
+		{
 			writeCode(bt, OP_RETURN);
+			writeCode(bt, addBucketValue(bt, (Value)0));
+		}
 	}
 #undef SIZE_OF_STACK
 }

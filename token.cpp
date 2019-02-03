@@ -22,8 +22,7 @@ void addTokenData(TokenArray* ta, char* data)
 	}
 	else
 	{
-		newToken->data = (char*)malloc(sizeof(char) * strlen(data) + 1);
-		strcpy(newToken->data, data);
+		newToken->data = data;
 	}
 
 	if (ta->current == NULL)

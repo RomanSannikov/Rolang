@@ -6,6 +6,7 @@
 
 typedef enum
 {
+	TOKEN_NOPE,
 	TOKEN_NUMBER,
 	TOKEN_STRING,
 	

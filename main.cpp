@@ -20,14 +20,27 @@ void scanFile(Bucket* bt, const char* fileName)
 	{
 		word[counter] = fgetc(file);
 
-		if ((word[counter] == ' ' || word[counter] == '\n' || word[counter] == EOF) && isWord)
+		if ((word[counter] == ' ' || word[counter] == '\n' || word[counter] == ';' || word[counter] == EOF) && isWord)
 		{
 			char* tempData = (char*)malloc(sizeof(char) * counter + 1);
+			char lastChar = word[counter];
+			
 			word[counter] = '\0';
 			strcpy(tempData, word);
 			addTokenData(bt->tokens, tempData);
 			counter = -1;
 			isWord = false;
+
+			if (lastChar == ';')
+			{
+				char* semicolon = (char*)malloc(sizeof(char) * 2);
+
+				semicolon[0] = lastChar;
+				semicolon[1] = '\0';
+				addTokenData(bt->tokens, strcpy((char*)malloc(sizeof(char) * 2), semicolon));
+
+				free(semicolon);
+			}
 		}
 		else
 			isWord = true;
@@ -53,6 +66,7 @@ int main(int argc, char* argv[])
 	if (recognize(&bucket) != COMPILED_WELL)
 	{
 		printf("Cannot recognize...\n");
+		freeBucket(&bucket);
 		exit(1);
 	}
 
